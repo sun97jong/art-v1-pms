@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>ART-V1 HW PMS</title>
+<style>
+:root{--bg:#f4f5f7;--fg:#333;--ac:#1F497D;--btn:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#111418;--fg:#d6d9de;--ac:#8fb8ff;--btn:#1b1f24}}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+#m{text-align:center;padding:24px}
+#m button{margin-top:12px;padding:8px 18px;border:1px solid var(--ac);border-radius:6px;background:var(--btn);color:var(--ac);font:inherit;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="m">ART-V1 HW PMS 불러오는 중…</div>
+<script>
+/* ART-V1 HW PMS 로더. 화면과 데이터는 전부 Google Apps Script 쪽에 있고, 이 파일은 그걸 구글 로그인 쿠키 없이 불러오기만 함
+   (구글 계정 여러 개가 로그인된 브라우저에서 웹앱 주소가 안 열리는 문제 회피용). 비밀번호 / 데이터는 여기 없음 */
+(function () {
+  var EXEC = 'https://script.google.com/macros/s/AKfycbxSR6L4d6xG9jafH13QJhlhXBtF0NOXBZQnE5TXHUHwmrBrfWZyTzujIKPMFDP6dYs4/exec';
+  function fail() {
+    var m = document.getElementById('m'); m.textContent = '';
+    var p = document.createElement('div'); p.textContent = '화면을 불러오지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요.';
+    var b = document.createElement('button'); b.textContent = '다시 시도'; b.onclick = function () { location.reload(); };
+    m.appendChild(p); m.appendChild(b);
+  }
+  var c = window.AbortController ? new AbortController() : null;
+  var t = setTimeout(function () { if (c) c.abort(); }, 25000);
+  fetch(EXEC + '?ui=1', { credentials: 'omit', cache: 'no-store', signal: c ? c.signal : undefined })
+    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+    .then(function (h) { clearTimeout(t); if (h.indexOf('<html') < 0) throw new Error('bad'); document.open(); document.write(h); document.close(); })
+    .catch(function () { clearTimeout(t); fail(); });
+})();
+</script>
+</body>
+</html>
